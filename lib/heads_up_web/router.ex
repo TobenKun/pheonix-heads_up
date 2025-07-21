@@ -19,6 +19,7 @@ defmodule HeadsUpWeb.Router do
     answer = ~w(Yes No Maybe) |> Enum.random()
 
     conn = assign(conn, :answer, answer)
+    IO.inspect(conn)
 
     conn
   end
@@ -27,6 +28,7 @@ defmodule HeadsUpWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/tips", TipController, :index
   end
 
   # Other scopes may use custom stacks.
