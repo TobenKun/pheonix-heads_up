@@ -9,4 +9,10 @@ defmodule HeadsUpWeb.TipController do
 
     render(conn, :index, tips: tips, emojis: emojis)
   end
+
+  def show(conn, %{"id" => id}) do
+    tip = Tips.get_tip(id)
+
+    render(conn, :show, tip: tip)
+  end
 end

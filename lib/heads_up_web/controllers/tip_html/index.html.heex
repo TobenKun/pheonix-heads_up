@@ -3,7 +3,9 @@
   <p>{@emojis}</p>
   <ol>
     <%= for tip <- @tips do %>
-      <li>{tip.text}</li>
+      <a href={~p"/tips/#{tip.id}"}>
+        <li>{tip.text}</li>
+      </a>
     <% end %>
   </ol>
 </div>
