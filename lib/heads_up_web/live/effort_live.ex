@@ -2,10 +2,13 @@ defmodule HeadsUpWeb.EffortLive do
   use HeadsUpWeb, :live_view
 
   def mount(_params, _sessions, socket) do
+    IO.inspect(self(), label: "MOUNT")
     {:ok, assign(socket, responders: 0, minutes_per_responder: 10)}
   end
 
   def render(assigns) do
+    IO.inspect(self(), label: "RENDER")
+
     ~H"""
     <div class="effort">
       <section>
@@ -29,6 +32,7 @@ defmodule HeadsUpWeb.EffortLive do
   end
 
   def handle_event("add", %{"quantity" => quantity}, socket) do
+    IO.inspect(self(), label: "ADD")
     socket = update(socket, :responders, &(&1 + String.to_integer(quantity)))
 
     {:noreply, socket}
