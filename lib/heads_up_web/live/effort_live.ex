@@ -7,7 +7,7 @@ defmodule HeadsUpWeb.EffortLive do
     end
 
     IO.inspect(self(), label: "MOUNT")
-    {:ok, assign(socket, responders: 0, minutes_per_responder: 10)}
+    {:ok, assign(socket, responders: 0, minutes_per_responder: 10, page_title: "Effort")}
   end
 
   def render(assigns) do
