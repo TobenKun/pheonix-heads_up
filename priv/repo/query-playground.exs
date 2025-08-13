@@ -53,3 +53,10 @@ Incident
   |> where([r], fragment("? % 2 = 0", r.id))
   |> Repo.all()
   |> IO.inspect()
+
+# select 한번 써보기
+Incident
+  |> where([r], ilike(r.name, "%m%"))
+  |> select([r], r.name)
+  |> Repo.all()
+  |> IO.inspect()
