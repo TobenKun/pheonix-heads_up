@@ -1,9 +1,18 @@
 defmodule HeadsUp.Incidents do
   alias HeadsUp.Incidents.Incident
   alias HeadsUp.Repo
+  import Ecto.Query
 
   def list_incidents do
     Repo.all(Incident)
+  end
+
+  def filter_incidents do
+    Incident
+    |> where(status: :resolved)
+    |> where([r], ilike(r.name, "%in%"))
+    |> order_by(desc: :name)
+    |> Repo.all()
   end
 
   def get_incident!(id) do
@@ -11,6 +20,11 @@ defmodule HeadsUp.Incidents do
   end
 
   def urgent_incidents(incident) do
-    list_incidents() |> List.delete(incident)
+    Incident
+    |> where(status: :pending)
+    |> where([r], r.id != ^incident.id)
+    |> order_by(asc: :priority)
+    |> limit(3)
+    |> Repo.all()
   end
 end
