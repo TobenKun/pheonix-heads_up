@@ -15,7 +15,7 @@ defmodule HeadsUp.Incidents do
     |> Repo.all()
   end
 
-  defp with_status(query, status) when status in ~W(pendng resolved canceled) do
+  defp with_status(query, status) when status in ~W(pending resolved canceled) do
     where(query, status: ^status)
   end
 
