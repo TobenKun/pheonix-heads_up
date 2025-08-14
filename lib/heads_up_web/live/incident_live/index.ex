@@ -5,11 +5,15 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   import HeadsUpWeb.CustomComponents
 
   def mount(_params, _sessions, socket) do
+    {:ok, socket}
+  end
+
+  def handle_params(params, _uri, socket) do
     socket =
       socket
       |> assign(page_title: "Incidents")
-      |> assign(form: to_form(%{"q" => "", "status" => "", "sort_by" => ""}))
-      |> stream(:incidents, Incidents.list_incidents())
+      |> assign(form: to_form(params))
+      |> stream(:incidents, Incidents.filter_incidents(params))
 
     socket =
       attach_hook(socket, :log_stream, :after_render, fn
@@ -18,7 +22,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
           socket
       end)
 
-    {:ok, socket}
+    {:noreply, socket}
   end
 
   def render(assigns) do
@@ -69,6 +73,9 @@ defmodule HeadsUpWeb.IncidentLive.Index do
           "Priority: Low to High": "priority_asc"
         ]}
       />
+      <.link navigate={~p"/incidents"}>
+        Reset
+      </.link>
     </.form>
     """
   end
@@ -94,11 +101,28 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   end
 
   def handle_event("filter", params, socket) do
-    socket =
-      socket
-      |> assign(:form, to_form(params))
-      |> stream(:incidents, Incidents.filter_incidents(params), reset: true)
+    params =
+      params
+      |> Map.take(~W(q status sort_by))
+      |> Map.reject(fn {_, v} -> v == "" end)
+
+    socket = push_navigate(socket, to: ~p"/incidents?#{params}")
 
     {:noreply, socket}
   end
 end
+
+"""
+# make the filter criteria shareable and bookmarkable!
+
+#### 해야할 것
+- filter handle event에서 params 정리하기
+  -> q, status, sort_by 필드만 가져오고 비어있는 필드는 맵에서 삭제
+
+- push_navigate 함수로 url을 바꿔서 새로 마운트 하기
+  -> 인자로는 정리된 params 전달
+
+- handle_param 콜백 선언하고 마운트에 있는 동작 handle_param콜백으로 인자로는
+
+- url에 있는 값을 받아오는 params 맵을 to_form함수에 전달해서 :form에 assign 하기
+"""
