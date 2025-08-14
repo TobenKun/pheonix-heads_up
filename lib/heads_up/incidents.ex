@@ -9,10 +9,31 @@ defmodule HeadsUp.Incidents do
 
   def filter_incidents(filter) do
     Incident
-    |> where(status: ^filter["status"])
-    |> where([r], ilike(r.name, ^"%#{filter["q"]}%"))
-    |> order_by(desc: :name)
+    |> with_status(filter["status"])
+    |> search_by(filter["q"])
+    |> sort(filter["sort_by"])
     |> Repo.all()
+  end
+
+  defp with_status(query, status) when status in ~W(pendng resolved canceled) do
+    where(query, status: ^status)
+  end
+
+  defp with_status(query, _), do: query
+
+  defp search_by(query, q) when q in ["", nil], do: query
+
+  defp search_by(query, q) do
+    where(query, [r], ilike(r.name, ^"%#{q}%"))
+  end
+
+  defp sort_option("name"), do: :name
+  defp sort_option("priority_desc"), do: [desc: :priority]
+  defp sort_option("priority_asc"), do: [asc: :priority]
+  defp sort_option(_), do: :id
+
+  defp sort(query, sort_by) do
+    order_by(query, ^sort_option(sort_by))
   end
 
   def get_incident!(id) do
